@@ -6,9 +6,24 @@ body {
 }
 
 .attribution {
-	font-size: 11px;
-	text-align: center;
+  font-size: 11px;
+  text-align: center;
 }
 .attribution a {
-	color: hsl(228, 45%, 44%);
+  color: hsl(228, 45%, 44%);
+}
+
+.replay {
+  position: relative;
+}
+
+.replay::before {
+  content: '';
+  height: 98%;
+  width: 2px;
+  background-color: #ddd;
+  position: absolute;
+  top: 50%;
+  left: calc(12% / 2);
+  transform: translate(-50%, -50%);
 }
