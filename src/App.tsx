@@ -33,13 +33,15 @@ function App() {
       <div
         className={clsx(
           'w-full h-40 max-w-3xl',
-          'mx-auto my-6 p-6',
+          'mx-auto my-6 sm:p-6 p-3',
           'bg-white rounded-lg',
           'flex gap-4'
         )}>
         <Avatar user={data.currentUser} className="w-10 h-10" />
         <textarea
-          className={clsx('px-4 py-2 border flex-1 rounded-lg')}
+          className={clsx(
+            'px-4 py-2 border flex-1 rounded-lg w-full'
+          )}
           name="comment"
           id="comment"
           placeholder="Add a Comment..."></textarea>

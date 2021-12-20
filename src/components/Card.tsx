@@ -107,7 +107,7 @@ function ControlButton({
 export function CommentCard({ comment, currentUser }: CommentProps) {
   return (
     <>
-      <div className="flex w-full h-auto gap-6 bg-white rounded-lg shadow-sm p-7">
+      <div className="flex w-full h-auto gap-6 p-3 bg-white rounded-lg shadow-sm sm:p-7">
         {/* feature */}
         <Feature score={comment.score} />
         {/* COMMENT SECTION */}
@@ -150,7 +150,6 @@ type ReplayCardProps = {
 }
 
 export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
-  const isCurrentUser = currentUser.username === replay.user.username
   return (
     <div className="flex w-[88%] h-auto max-w-3xl gap-6 p-8 bg-white rounded-lg shadow-sm">
       {/* feature */}
