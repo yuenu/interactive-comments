@@ -39,7 +39,9 @@ type HeaderProps = {
   createdAt: string
   currentUser: User
 }
+
 function Header({ user, createdAt, currentUser }: HeaderProps) {
+  const isCurrentUser = currentUser.username === user.username
   return (
     <header className="flex items-center gap-4">
       <Avatar user={user} className="w-8 h-8" />
@@ -47,33 +49,57 @@ function Header({ user, createdAt, currentUser }: HeaderProps) {
         {user.username}
       </span>
 
-      {currentUser.username === user.username && (
+      {isCurrentUser && (
         <span className="inline-block px-2 py-1 text-xs font-bold text-white bg-primary">
           you
         </span>
       )}
       <p className="text-blue-dark">{createdAt}</p>
 
-      <ControlSection className="ml-auto" />
+      <div className="flex items-center gap-5 ml-auto">
+        {isCurrentUser && (
+          <ControlButton
+            className={clsx(
+              'text-red-soft hover:text-red-pale',
+              'fill-red-soft hover:fill-red-pale'
+            )}
+            text="Delete"
+            icon={<Icon.Delete />}
+          />
+        )}
+        <ControlButton
+          className={clsx(
+            'text-primary hover:text-blue-bg',
+            'fill-primary hover:fill-blue-bg'
+          )}
+          text="Replay"
+          icon={<Icon.Reply />}
+        />
+      </div>
     </header>
   )
 }
 
-type ControlSectionProps = {
+type ControlButtonProps = {
   className?: string
+  text: string
+  icon: ReactNode
 }
 
-function ControlSection({ className }: ControlSectionProps) {
+function ControlButton({
+  className,
+  text,
+  icon,
+}: ControlButtonProps) {
   return (
     <div
       className={clsx(
-        'flex items-center gap-2 cursor-pointer',
-        'text-primary hover:text-blue-bg',
-        'fill-primary hover:fill-blue-bg',
+        'flex items-center gap-2',
+        'cursor-pointer',
         className
       )}>
-      <Icon.Reply />
-      <span className={clsx('font-semibold')}>Replay</span>
+      {icon}
+      <span className={clsx('font-semibold')}>{text}</span>
     </div>
   )
 }
@@ -124,6 +150,7 @@ type ReplayCardProps = {
 }
 
 export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
+  const isCurrentUser = currentUser.username === replay.user.username
   return (
     <div className="flex w-[88%] h-auto max-w-3xl gap-6 p-8 bg-white rounded-lg shadow-sm">
       {/* feature */}
