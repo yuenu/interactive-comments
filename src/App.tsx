@@ -7,7 +7,7 @@ function App() {
   return (
     <main
       className={clsx(
-        'w-full min-h-screen',
+        'min-h-screen',
         'flex flex-col',
         'bg-gray-light'
       )}>
@@ -15,7 +15,7 @@ function App() {
       <div
         className={clsx(
           'flex flex-col items-center',
-          'w-full h-full gap-5 mt-10'
+          'h-full gap-5 m-4 md:m-0 md:mt-10'
         )}>
         {data.comments.map((comment) => {
           return (
@@ -30,29 +30,34 @@ function App() {
       </div>
 
       {/* INPUT SECTION */}
-      <div
-        className={clsx(
-          'w-full h-40 max-w-3xl',
-          'mx-auto my-6 sm:p-6 p-3',
-          'bg-white rounded-lg',
-          'flex gap-4'
-        )}>
-        <Avatar user={data.currentUser} className="w-10 h-10" />
-        <textarea
+      <div className="p-4 pt-0 md:p-0">
+        <div
           className={clsx(
-            'px-4 py-2 border flex-1 rounded-lg w-full'
-          )}
-          name="comment"
-          id="comment"
-          placeholder="Add a Comment..."></textarea>
-
-        <button
-          className={clsx(
-            'h-12 rounded-lg px-7',
-            'bg-primary text-white hover:bg-blue-bg'
+            'h-auto md:h-40 md:max-w-3xl relative',
+            'mx-auto my-6 p-5 md:p-6',
+            'bg-white rounded-lg',
+            'flex gap-6 md:gap-4 flex-col md:flex-row',
+            'w-full'
           )}>
-          SEND
-        </button>
+          <Avatar
+            user={data.currentUser}
+            className={clsx('w-10 h-10', 'order-1 md:-order-1')}
+          />
+          <textarea
+            className={clsx('px-4 py-2 border flex-1 rounded-lg')}
+            name="comment"
+            id="comment"
+            placeholder="Add a Comment..."></textarea>
+
+          <button
+            className={clsx(
+              'h-12 rounded-lg px-7',
+              'bg-primary text-white hover:bg-blue-bg',
+              'absolute md:relative bottom-3 right-5 md:bottom-0 md:right-0'
+            )}>
+            SEND
+          </button>
+        </div>
       </div>
       {/* footer section  */}
       <Footer />

@@ -14,7 +14,12 @@ type FeatureProps = {
 
 function Feature({ score }: FeatureProps) {
   return (
-    <div className="flex flex-col items-center justify-center w-24 h-full gap-2 py-2 rounded-lg bg-gray-light">
+    <div
+      className={clsx(
+        'flex flex-row sm:flex-col items-center justify-center',
+        'w-24 h-full gap-2 py-2',
+        'rounded-lg bg-gray-light'
+      )}>
       <button
         className={clsx(
           'flex items-center justify-center w-5 h-5',
@@ -50,31 +55,50 @@ function Header({ user, createdAt, currentUser }: HeaderProps) {
       </span>
 
       {isCurrentUser && (
-        <span className="inline-block px-2 py-1 text-xs font-bold text-white bg-primary">
+        <span
+          className={clsx(
+            'inline-block px-2 py-1',
+            'text-xs font-bold text-white bg-primary'
+          )}>
           you
         </span>
       )}
       <p className="text-blue-dark">{createdAt}</p>
 
-      <div className="flex items-center gap-5 ml-auto">
-        {isCurrentUser && (
+      <div
+        className={clsx(
+          'flex items-center gap-5 ml-auto',
+          'absolute bottom-5 right-5 sm:relative sm:bottom-0 sm:right-0'
+        )}>
+        {isCurrentUser ? (
+          <>
+            <ControlButton
+              className={clsx(
+                'text-red-soft hover:text-red-pale',
+                'fill-red-soft hover:fill-red-pale'
+              )}
+              text="Delete"
+              icon={<Icon.Delete />}
+            />
+            <ControlButton
+              className={clsx(
+                'text-primary hover:text-blue-bg',
+                'fill-primary hover:fill-blue-bg'
+              )}
+              text="Edit"
+              icon={<Icon.Edit />}
+            />
+          </>
+        ) : (
           <ControlButton
             className={clsx(
-              'text-red-soft hover:text-red-pale',
-              'fill-red-soft hover:fill-red-pale'
+              'text-primary hover:text-blue-bg',
+              'fill-primary hover:fill-blue-bg'
             )}
-            text="Delete"
-            icon={<Icon.Delete />}
+            text="Reply"
+            icon={<Icon.Reply />}
           />
         )}
-        <ControlButton
-          className={clsx(
-            'text-primary hover:text-blue-bg',
-            'fill-primary hover:fill-blue-bg'
-          )}
-          text="Replay"
-          icon={<Icon.Reply />}
-        />
       </div>
     </header>
   )
@@ -107,18 +131,21 @@ function ControlButton({
 export function CommentCard({ comment, currentUser }: CommentProps) {
   return (
     <>
-      <div className="flex w-full h-auto gap-6 p-3 bg-white rounded-lg shadow-sm sm:p-7">
+      <div
+        className={clsx(
+          'relative flex flex-col sm:flex-row gap-6',
+          'h-auto p-5 sm:p-7',
+          'bg-white rounded-lg shadow-sm'
+        )}>
         {/* feature */}
         <Feature score={comment.score} />
         {/* COMMENT SECTION */}
-        <div>
-          {/* comment header */}
+        <div className="-order-1 sm:order-1">
           <Header
             user={comment.user}
             createdAt={comment.createdAt}
             currentUser={currentUser}
           />
-          {/* comment content */}
           <span className="inline-block pr-10 mt-3 text-blue-dark">
             {comment.content}
           </span>
@@ -130,10 +157,11 @@ export function CommentCard({ comment, currentUser }: CommentProps) {
         {comment.replies &&
           comment.replies.map((replay) => {
             return (
-              <div className="flex flex-col items-end gap-4 mt-6">
+              <div
+                className="flex flex-col items-end gap-4 mt-6"
+                key={replay.id}>
                 <ReplayCard
                   replay={replay}
-                  key={replay.id}
                   currentUser={currentUser}
                 />
               </div>
@@ -151,11 +179,17 @@ type ReplayCardProps = {
 
 export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
   return (
-    <div className="flex w-[88%] h-auto max-w-3xl gap-6 p-8 bg-white rounded-lg shadow-sm">
+    <div
+      className={clsx(
+        'relative w-[95%] sm:w-[88%] h-auto max-w-3xl',
+        ' p-4 sm:p-7',
+        'bg-white rounded-lg shadow-sm',
+        'flex flex-col sm:flex-row gap-6'
+      )}>
       {/* feature */}
       <Feature score={replay.score} />
       {/* COMMENT SECTION */}
-      <div>
+      <div className="-order-1 sm:order-1">
         {/* comment header */}
         <Header
           createdAt={replay.createdAt}
@@ -163,7 +197,7 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
           currentUser={currentUser}
         />
         {/* comment content */}
-        <span className="inline-block pr-20 mt-3 text-blue-dark">
+        <span className="inline-block mt-3 sm:pr-20 text-blue-dark">
           {replay.replyingTo && (
             <a
               href={`#${replay.replyingTo}`}
