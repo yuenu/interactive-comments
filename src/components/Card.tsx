@@ -1,134 +1,30 @@
-import { Icon, Avatar } from '@/components'
+import {
+  CommentHeader,
+  CommentInput,
+  Feature,
+  Modal,
+} from '@/components'
 import clsx from 'clsx'
 import type { Comment, Replay, User } from '@/types'
-import { ReactNode } from 'react'
+import { useState } from 'react'
+import ReactDOM from 'react-dom'
 
 type CommentProps = {
   comment: Comment
   currentUser: User
+  last: boolean
 }
 
-type FeatureProps = {
-  score: number
-}
+export function CommentCard({
+  comment,
+  currentUser,
+  last,
+}: CommentProps) {
+  const [replyOpen, setReplyOpen] = useState(false)
+  const replyHandler = () => {
+    if (!last) setReplyOpen((prev) => !prev)
+  }
 
-function Feature({ score }: FeatureProps) {
-  return (
-    <div
-      className={clsx(
-        'flex flex-row sm:flex-col items-center justify-center',
-        'w-24 h-full gap-2 py-2',
-        'rounded-lg bg-gray-light'
-      )}>
-      <button
-        className={clsx(
-          'flex items-center justify-center w-5 h-5',
-          'fill-blue-bg hover:fill-primary'
-        )}>
-        <Icon.Plus />
-      </button>
-      <span className="font-bold text-primary">{score}</span>
-      <button
-        className={clsx(
-          'flex items-center justify-center w-5 h-5',
-          'fill-blue-bg hover:fill-primary'
-        )}>
-        <Icon.Minus />
-      </button>
-    </div>
-  )
-}
-
-type HeaderProps = {
-  user: User
-  createdAt: string
-  currentUser: User
-}
-
-function Header({ user, createdAt, currentUser }: HeaderProps) {
-  const isCurrentUser = currentUser.username === user.username
-  return (
-    <header className="flex items-center gap-4">
-      <Avatar user={user} className="w-8 h-8" />
-      <span className="font-bold text-blue-darker">
-        {user.username}
-      </span>
-
-      {isCurrentUser && (
-        <span
-          className={clsx(
-            'inline-block px-2 py-1',
-            'text-xs font-bold text-white bg-primary'
-          )}>
-          you
-        </span>
-      )}
-      <p className="text-blue-dark">{createdAt}</p>
-
-      <div
-        className={clsx(
-          'flex items-center gap-5 ml-auto',
-          'absolute bottom-5 right-5 sm:relative sm:bottom-0 sm:right-0'
-        )}>
-        {isCurrentUser ? (
-          <>
-            <ControlButton
-              className={clsx(
-                'text-red-soft hover:text-red-pale',
-                'fill-red-soft hover:fill-red-pale'
-              )}
-              text="Delete"
-              icon={<Icon.Delete />}
-            />
-            <ControlButton
-              className={clsx(
-                'text-primary hover:text-blue-bg',
-                'fill-primary hover:fill-blue-bg'
-              )}
-              text="Edit"
-              icon={<Icon.Edit />}
-            />
-          </>
-        ) : (
-          <ControlButton
-            className={clsx(
-              'text-primary hover:text-blue-bg',
-              'fill-primary hover:fill-blue-bg'
-            )}
-            text="Reply"
-            icon={<Icon.Reply />}
-          />
-        )}
-      </div>
-    </header>
-  )
-}
-
-type ControlButtonProps = {
-  className?: string
-  text: string
-  icon: ReactNode
-}
-
-function ControlButton({
-  className,
-  text,
-  icon,
-}: ControlButtonProps) {
-  return (
-    <div
-      className={clsx(
-        'flex items-center gap-2',
-        'cursor-pointer',
-        className
-      )}>
-      {icon}
-      <span className={clsx('font-semibold')}>{text}</span>
-    </div>
-  )
-}
-
-export function CommentCard({ comment, currentUser }: CommentProps) {
   return (
     <>
       <div
@@ -137,21 +33,18 @@ export function CommentCard({ comment, currentUser }: CommentProps) {
           'h-auto p-5 sm:p-7',
           'bg-white rounded-lg shadow-sm'
         )}>
-        {/* feature */}
         <Feature score={comment.score} />
-        {/* COMMENT SECTION */}
-        <div className="-order-1 sm:order-1">
-          <Header
+        <div className="flex-1 -order-1 sm:order-1">
+          <CommentHeader
             user={comment.user}
             createdAt={comment.createdAt}
             currentUser={currentUser}
+            onReply={replyHandler}
           />
-          <span className="inline-block pr-10 mt-3 text-blue-dark">
+          <span className="inline-block pr-0 mt-3 sm:pr-10 text-blue-dark">
             {comment.content}
           </span>
         </div>
-
-        {/* replay button */}
       </div>
       <div className="replay">
         {comment.replies &&
@@ -168,6 +61,9 @@ export function CommentCard({ comment, currentUser }: CommentProps) {
             )
           })}
       </div>
+      {replyOpen && (
+        <CommentInput currentUser={currentUser} className="mt-3" />
+      )}
     </>
   )
 }
@@ -178,36 +74,80 @@ type ReplayCardProps = {
 }
 
 export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
+  const [replyOpen, setReplyOpen] = useState(false)
+  const [modalOpen, setModalOpen] = useState(false)
+  const portalDiv = document.getElementById('modal')!
+  const [editMode, setEditMode] = useState(false)
+
+  const onDelete = () => setModalOpen(true)
+  const onCancel = () => setModalOpen(false)
+  const onEdit = () => setEditMode((prev) => !prev)
+  const onUpdated = () => setEditMode(false)
+
+  const deleteHandler = () => {
+    console.log('delete')
+    setModalOpen(false)
+  }
+
   return (
-    <div
-      className={clsx(
-        'relative w-[95%] sm:w-[88%] h-auto max-w-3xl',
-        ' p-4 sm:p-7',
-        'bg-white rounded-lg shadow-sm',
-        'flex flex-col sm:flex-row gap-6'
-      )}>
-      {/* feature */}
-      <Feature score={replay.score} />
-      {/* COMMENT SECTION */}
-      <div className="-order-1 sm:order-1">
-        {/* comment header */}
-        <Header
-          createdAt={replay.createdAt}
-          user={replay.user}
-          currentUser={currentUser}
-        />
-        {/* comment content */}
-        <span className="inline-block mt-3 sm:pr-20 text-blue-dark">
-          {replay.replyingTo && (
-            <a
-              href={`#${replay.replyingTo}`}
-              className="font-bold cursor-pointer text-primary">
-              @{replay.replyingTo}&nbsp;
-            </a>
+    <>
+      <div
+        className={clsx(
+          'relative w-[95%] sm:w-[88%] h-auto max-w-3xl',
+          ' p-4 sm:p-7',
+          'bg-white rounded-lg shadow-sm',
+          'flex flex-col sm:flex-row gap-6'
+        )}>
+        <Feature score={replay.score} />
+        <div className="flex-1 -order-1 sm:order-1">
+          <CommentHeader
+            createdAt={replay.createdAt}
+            user={replay.user}
+            currentUser={currentUser}
+            onReply={() => setReplyOpen((prev) => !prev)}
+            onDelete={onDelete}
+            onEdit={onEdit}
+          />
+          {!editMode ? (
+            <span className="inline-block mt-3 sm:pr-20 text-blue-dark">
+              {replay.replyingTo && (
+                <a
+                  href={`#${replay.replyingTo}`}
+                  className="font-bold cursor-pointer text-primary">
+                  @{replay.replyingTo}&nbsp;
+                </a>
+              )}
+              {replay.content}
+            </span>
+          ) : (
+            <div>
+              <textarea
+                className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
+                name="edit"
+                id="edit"
+                value={
+                  `@${replay.replyingTo} ` + replay.content
+                }></textarea>
+              <button
+                className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
+                onClick={onUpdated}>
+                UPDATED
+              </button>
+            </div>
           )}
-          {replay.content}
-        </span>
+        </div>
       </div>
-    </div>
+      {replyOpen && (
+        <CommentInput
+          currentUser={currentUser}
+          className="w-[95%] sm:w-[88%] p-0"
+        />
+      )}
+      {modalOpen &&
+        ReactDOM.createPortal(
+          <Modal onCancel={onCancel} onDelete={deleteHandler} />,
+          portalDiv
+        )}
+    </>
   )
 }
