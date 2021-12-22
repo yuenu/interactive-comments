@@ -1,8 +1,10 @@
 import { Footer, CommentCard, CommentInput } from '@/components'
 import clsx from 'clsx'
-import data from './data.json'
+import { useAppSelector } from '@/store'
 
 function App() {
+  const data = useAppSelector((state) => state.commentsSlice.data)
+
   return (
     <main
       className={clsx(
@@ -17,7 +19,7 @@ function App() {
         )}>
         {data.comments.map((comment, index) => {
           return (
-            <div key={comment.id} className="max-w-3xl">
+            <div key={comment.id} className="w-full max-w-3xl">
               <CommentCard
                 comment={comment}
                 currentUser={data.currentUser}
@@ -30,7 +32,6 @@ function App() {
 
       <CommentInput
         id="comment-input"
-        currentUser={data.currentUser}
         className="px-4 mt-0 md:mt-5"
       />
       <Footer />

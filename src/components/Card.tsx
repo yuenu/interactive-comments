@@ -6,7 +6,7 @@ import {
 } from '@/components'
 import clsx from 'clsx'
 import type { Comment, Replay, User } from '@/types'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
 
 type CommentProps = {
@@ -61,9 +61,7 @@ export function CommentCard({
             )
           })}
       </div>
-      {replyOpen && (
-        <CommentInput currentUser={currentUser} className="mt-3" />
-      )}
+      {replyOpen && <CommentInput className="mt-3" />}
     </>
   )
 }
@@ -76,17 +74,31 @@ type ReplayCardProps = {
 export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
   const [replyOpen, setReplyOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
-  const portalDiv = document.getElementById('modal')!
   const [editMode, setEditMode] = useState(false)
+
+  const originContentText = `@${replay.replyingTo} ` + replay.content
+  const [editText, setEditText] = useState(originContentText)
+  const portalDiv = document.getElementById('modal')!
 
   const onDelete = () => setModalOpen(true)
   const onCancel = () => setModalOpen(false)
-  const onEdit = () => setEditMode((prev) => !prev)
-  const onUpdated = () => setEditMode(false)
+  const onEdit = () => {
+    setEditMode((prev) => !prev)
+    if (!editMode) setEditText(originContentText)
+  }
+  const onUpdated = () => {
+    setEditMode(false)
+  }
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const deleteHandler = () => {
     console.log('delete')
     setModalOpen(false)
+  }
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditText(e.target.value)
   }
 
   return (
@@ -122,12 +134,12 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
           ) : (
             <div>
               <textarea
+                ref={textareaRef}
+                onChange={onChange}
                 className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
                 name="edit"
                 id="edit"
-                value={
-                  `@${replay.replyingTo} ` + replay.content
-                }></textarea>
+                value={editText}></textarea>
               <button
                 className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
                 onClick={onUpdated}>
@@ -138,10 +150,7 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
         </div>
       </div>
       {replyOpen && (
-        <CommentInput
-          currentUser={currentUser}
-          className="w-[95%] sm:w-[88%] p-0"
-        />
+        <CommentInput className="w-[95%] sm:w-[88%] p-0" />
       )}
       {modalOpen &&
         ReactDOM.createPortal(
