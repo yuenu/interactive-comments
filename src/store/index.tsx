@@ -21,14 +21,12 @@ const commentsSlice = createSlice({
   name: 'comments',
   initialState: initialState,
   reducers: {
-    addedComment: (state, action: PayloadAction<Comment>) => {
+    addComment: (state, action: PayloadAction<Comment>) => {
       state.data.comments.push(action.payload)
     },
-    updatedComment: (state, action: PayloadAction) => {},
-    deletedComment: (
-      state,
-      action: PayloadAction<{ id: number }>
-    ) => {
+    addReply: (state, action: PayloadAction) => {},
+    updateComment: (state, action: PayloadAction) => {},
+    deleteComment: (state, action: PayloadAction<{ id: number }>) => {
       state.data.comments = state.data.comments.filter((comment) => {
         return comment.id !== action.payload.id
       })
@@ -53,9 +51,9 @@ const commentsSlice = createSlice({
 })
 
 export const {
-  addedComment,
-  updatedComment,
-  deletedComment,
+  addComment,
+  updateComment,
+  deleteComment,
   deleteReply,
 } = commentsSlice.actions
 

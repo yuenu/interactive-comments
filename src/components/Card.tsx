@@ -8,7 +8,7 @@ import clsx from 'clsx'
 import type { Comment, Reply, User } from '@/types'
 import { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { deletedComment, useAppDispatch, deleteReply } from '@/store'
+import { deleteComment, useAppDispatch, deleteReply } from '@/store'
 
 const portalDiv = document.getElementById('modal')!
 
@@ -24,6 +24,7 @@ export function CommentCard({
   last,
 }: CommentProps) {
   const dispatch = useAppDispatch()
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const [modalOpen, setModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
@@ -49,7 +50,11 @@ export function CommentCard({
   }
 
   const deleteHandler = () => {
-    dispatch(deletedComment({ id: comment.id }))
+    dispatch(deleteComment({ id: comment.id }))
+  }
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditText(e.target.value)
   }
 
   return (
@@ -70,9 +75,26 @@ export function CommentCard({
             onDelete={onDelete}
             onEdit={onEdit}
           />
-          <span className="inline-block pr-0 mt-3 sm:pr-10 text-blue-dark">
-            {comment.content}
-          </span>
+          {!editMode ? (
+            <span className="inline-block pr-0 mt-3 sm:pr-10 text-blue-dark">
+              {comment.content}
+            </span>
+          ) : (
+            <div>
+              <textarea
+                ref={textareaRef}
+                onChange={onChange}
+                className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
+                name="edit"
+                id="edit"
+                value={editText}></textarea>
+              <button
+                className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
+                onClick={() => setEditMode(false)}>
+                UPDATED
+              </button>
+            </div>
+          )}
         </div>
       </div>
       <div className="replay">

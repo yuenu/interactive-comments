@@ -1,7 +1,7 @@
 import { Avatar } from '@/components'
 import clsx from 'clsx'
 import { useRef } from 'react'
-import { addedComment, useAppDispatch, useAppSelector } from '@/store'
+import { addComment, useAppDispatch, useAppSelector } from '@/store'
 import { Reply } from '@/types'
 
 type CommentInputProps = {
@@ -25,7 +25,7 @@ export function CommentInput({ className, id }: CommentInputProps) {
         score: 0,
         user: currentUser,
       }
-      dispatch(addedComment({ ...comment }))
+      dispatch(addComment({ ...comment }))
       textRef.current.value = ''
     }
   }
