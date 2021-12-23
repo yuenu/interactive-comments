@@ -7,7 +7,7 @@ export interface Comment {
   content: string
   createdAt: string
   id: number
-  replies: Replay[]
+  replies: Reply[]
   score: number
   user: User
 }
@@ -20,7 +20,7 @@ export interface User {
   }
 }
 
-export interface Replay {
+export interface Reply {
   id: number
   content: string
   createdAt: string

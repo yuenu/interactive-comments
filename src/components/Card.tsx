@@ -5,9 +5,12 @@ import {
   Modal,
 } from '@/components'
 import clsx from 'clsx'
-import type { Comment, Replay, User } from '@/types'
+import type { Comment, Reply, User } from '@/types'
 import { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
+import { deletedComment, useAppDispatch, deleteReply } from '@/store'
+
+const portalDiv = document.getElementById('modal')!
 
 type CommentProps = {
   comment: Comment
@@ -20,9 +23,33 @@ export function CommentCard({
   currentUser,
   last,
 }: CommentProps) {
+  const dispatch = useAppDispatch()
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+
+  const originContentText = comment.content
+  const [editText, setEditText] = useState(originContentText)
+
   const [replyOpen, setReplyOpen] = useState(false)
   const replyHandler = () => {
     if (!last) setReplyOpen((prev) => !prev)
+  }
+
+  const onDelete = () => {
+    setModalOpen(true)
+  }
+  const onEdit = () => {
+    setEditMode((prev) => !prev)
+    if (!editMode) setEditText(originContentText)
+  }
+
+  const onCancel = () => {
+    setModalOpen(false)
+  }
+
+  const deleteHandler = () => {
+    dispatch(deletedComment({ id: comment.id }))
   }
 
   return (
@@ -40,6 +67,8 @@ export function CommentCard({
             createdAt={comment.createdAt}
             currentUser={currentUser}
             onReply={replyHandler}
+            onDelete={onDelete}
+            onEdit={onEdit}
           />
           <span className="inline-block pr-0 mt-3 sm:pr-10 text-blue-dark">
             {comment.content}
@@ -48,52 +77,60 @@ export function CommentCard({
       </div>
       <div className="replay">
         {comment.replies &&
-          comment.replies.map((replay) => {
+          comment.replies.map((reply) => {
             return (
               <div
                 className="flex flex-col items-end gap-4 mt-6"
-                key={replay.id}>
+                key={reply.id}>
                 <ReplayCard
-                  replay={replay}
+                  reply={reply}
                   currentUser={currentUser}
+                  comment={comment}
                 />
               </div>
             )
           })}
       </div>
       {replyOpen && <CommentInput className="mt-3" />}
+      {modalOpen &&
+        ReactDOM.createPortal(
+          <Modal onCancel={onCancel} onDelete={deleteHandler} />,
+          portalDiv
+        )}
     </>
   )
 }
 
 type ReplayCardProps = {
-  replay: Replay
+  reply: Reply
   currentUser: User
+  comment?: Comment
 }
 
-export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
+export function ReplayCard({
+  reply,
+  currentUser,
+  comment,
+}: ReplayCardProps) {
+  const dispatch = useAppDispatch()
+
   const [replyOpen, setReplyOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
 
-  const originContentText = `@${replay.replyingTo} ` + replay.content
+  const originContentText = `@${reply.replyingTo} ` + reply.content
   const [editText, setEditText] = useState(originContentText)
-  const portalDiv = document.getElementById('modal')!
 
-  const onDelete = () => setModalOpen(true)
-  const onCancel = () => setModalOpen(false)
   const onEdit = () => {
     setEditMode((prev) => !prev)
     if (!editMode) setEditText(originContentText)
-  }
-  const onUpdated = () => {
-    setEditMode(false)
   }
 
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const deleteHandler = () => {
-    console.log('delete')
+    if (comment)
+      dispatch(deleteReply({ comment, deleteId: reply.id }))
     setModalOpen(false)
   }
 
@@ -110,26 +147,26 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
           'bg-white rounded-lg shadow-sm',
           'flex flex-col sm:flex-row gap-6'
         )}>
-        <Feature score={replay.score} />
+        <Feature score={reply.score} />
         <div className="flex-1 -order-1 sm:order-1">
           <CommentHeader
-            createdAt={replay.createdAt}
-            user={replay.user}
+            createdAt={reply.createdAt}
+            user={reply.user}
             currentUser={currentUser}
             onReply={() => setReplyOpen((prev) => !prev)}
-            onDelete={onDelete}
+            onDelete={() => setModalOpen(true)}
             onEdit={onEdit}
           />
           {!editMode ? (
             <span className="inline-block mt-3 sm:pr-20 text-blue-dark">
-              {replay.replyingTo && (
+              {reply.replyingTo && (
                 <a
-                  href={`#${replay.replyingTo}`}
+                  href={`#${reply.replyingTo}`}
                   className="font-bold cursor-pointer text-primary">
-                  @{replay.replyingTo}&nbsp;
+                  @{reply.replyingTo}&nbsp;
                 </a>
               )}
-              {replay.content}
+              {reply.content}
             </span>
           ) : (
             <div>
@@ -142,7 +179,7 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
                 value={editText}></textarea>
               <button
                 className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
-                onClick={onUpdated}>
+                onClick={() => setEditMode(false)}>
                 UPDATED
               </button>
             </div>
@@ -154,7 +191,10 @@ export function ReplayCard({ replay, currentUser }: ReplayCardProps) {
       )}
       {modalOpen &&
         ReactDOM.createPortal(
-          <Modal onCancel={onCancel} onDelete={deleteHandler} />,
+          <Modal
+            onCancel={() => setModalOpen(false)}
+            onDelete={deleteHandler}
+          />,
           portalDiv
         )}
     </>

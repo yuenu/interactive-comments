@@ -2,7 +2,7 @@ import { Avatar } from '@/components'
 import clsx from 'clsx'
 import { useRef } from 'react'
 import { addedComment, useAppDispatch, useAppSelector } from '@/store'
-import { Replay } from '@/types'
+import { Reply } from '@/types'
 
 type CommentInputProps = {
   className?: string
@@ -21,11 +21,12 @@ export function CommentInput({ className, id }: CommentInputProps) {
         content: textRef.current.value,
         createdAt: new Date().toDateString(),
         id: Math.round(Math.random() * 10000),
-        replies: [] as Replay[],
+        replies: [] as Reply[],
         score: 0,
         user: currentUser,
       }
       dispatch(addedComment({ ...comment }))
+      textRef.current.value = ''
     }
   }
   return (

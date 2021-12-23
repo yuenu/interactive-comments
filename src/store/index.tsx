@@ -12,6 +12,11 @@ const initialState = {
   data: data,
 }
 
+type DeleteReplyProps = {
+  comment: Comment
+  deleteId: number
+}
+
 const commentsSlice = createSlice({
   name: 'comments',
   initialState: initialState,
@@ -20,12 +25,39 @@ const commentsSlice = createSlice({
       state.data.comments.push(action.payload)
     },
     updatedComment: (state, action: PayloadAction) => {},
-    deletedComment: (state, action: PayloadAction) => {},
+    deletedComment: (
+      state,
+      action: PayloadAction<{ id: number }>
+    ) => {
+      state.data.comments = state.data.comments.filter((comment) => {
+        return comment.id !== action.payload.id
+      })
+    },
+    deleteReply: (state, action: PayloadAction<DeleteReplyProps>) => {
+      const remainOfReplies = action.payload.comment.replies.filter(
+        (reply) => reply.id !== action.payload.deleteId
+      )
+
+      const deleteeReplyComment = {
+        ...action.payload.comment,
+        replies: remainOfReplies,
+      }
+
+      state.data.comments = state.data.comments.map((comment) => {
+        if (comment.id === deleteeReplyComment.id)
+          return deleteeReplyComment
+        return comment
+      })
+    },
   },
 })
 
-export const { addedComment, updatedComment, deletedComment } =
-  commentsSlice.actions
+export const {
+  addedComment,
+  updatedComment,
+  deletedComment,
+  deleteReply,
+} = commentsSlice.actions
 
 export const store = configureStore({
   reducer: {
