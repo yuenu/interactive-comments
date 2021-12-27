@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { ReactNode } from 'react'
+import { ReactNode, isValidElement, cloneElement } from 'react'
 
 type ControlButtonProps = {
   className?: string
@@ -22,7 +22,7 @@ export function ControlButton({
         'cursor-pointer',
         className
       )}>
-      {icon}
+      {isValidElement(icon) && cloneElement(icon)}
       <span className={clsx('font-semibold')}>{text}</span>
     </div>
   )

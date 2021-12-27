@@ -31,8 +31,10 @@ function App() {
       </div>
 
       <CommentInput
+        type="comment"
         id="comment-input"
         className="px-4 mt-0 md:mt-5"
+        placeholder="Add a Comment..."
       />
       <Footer />
     </main>

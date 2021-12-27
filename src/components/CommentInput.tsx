@@ -1,34 +1,71 @@
 import { Avatar } from '@/components'
 import clsx from 'clsx'
 import { useRef } from 'react'
-import { addComment, useAppDispatch, useAppSelector } from '@/store'
-import { Reply } from '@/types'
+import {
+  addComment,
+  addReply,
+  useAppDispatch,
+  useAppSelector,
+} from '@/store'
+import { Comment, Reply } from '@/types'
 
 type CommentInputProps = {
   className?: string
   id?: string
+  type: 'comment' | 'reply'
+  comment?: Comment
+  placeholder?: string
 }
 
-export function CommentInput({ className, id }: CommentInputProps) {
+export function CommentInput({
+  className,
+  id,
+  type,
+  comment: currentComment,
+  placeholder = 'Add a Reply...',
+}: CommentInputProps) {
   const textRef = useRef<HTMLTextAreaElement | null>(null)
   const currentUser = useAppSelector(
     (state) => state.commentsSlice.data.currentUser
   )
   const dispatch = useAppDispatch()
-  const onAddComment = () => {
+
+  const onSubmitHandler = () => {
     if (textRef.current) {
-      const comment = {
-        content: textRef.current.value,
-        createdAt: new Date().toDateString(),
-        id: Math.round(Math.random() * 10000),
-        replies: [] as Reply[],
-        score: 0,
-        user: currentUser,
+      switch (type) {
+        case 'comment':
+          const comment = {
+            content: textRef.current.value,
+            createdAt: new Date().toDateString(),
+            id: Math.round(Math.random() * 10000),
+            replies: [] as Reply[],
+            score: 0,
+            user: currentUser,
+          }
+          dispatch(addComment({ ...comment }))
+          textRef.current.value = ''
+          break
+        case 'reply':
+          if (currentComment) {
+            const reply = {
+              id: Math.round(Math.random() * 10000),
+              content: textRef.current.value,
+              createdAt: new Date().toDateString(),
+              score: 0,
+              replyingTo: currentComment.user.username,
+              user: currentUser,
+            }
+
+            dispatch(
+              addReply({ commentId: currentComment.id, reply })
+            )
+          }
+          textRef.current.value = ''
+          break
       }
-      dispatch(addComment({ ...comment }))
-      textRef.current.value = ''
     }
   }
+
   return (
     <div className={clsx('', className)} id={id}>
       <div
@@ -48,10 +85,10 @@ export function CommentInput({ className, id }: CommentInputProps) {
           className={clsx('px-4 py-2 border flex-1 rounded-lg')}
           name="comment"
           id="comment"
-          placeholder="Add a Comment..."></textarea>
+          placeholder={placeholder}></textarea>
 
         <button
-          onClick={onAddComment}
+          onClick={onSubmitHandler}
           className={clsx(
             'h-12 rounded-lg px-7',
             'bg-primary text-white hover:bg-blue-bg',

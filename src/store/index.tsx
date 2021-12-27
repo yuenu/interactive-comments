@@ -6,10 +6,15 @@ import {
   useDispatch,
   useSelector,
 } from 'react-redux'
-import { Comment } from '@/types'
+import { Comment, Reply } from '@/types'
 
 const initialState = {
   data: data,
+}
+
+type AddReplyProps = {
+  reply: Reply
+  commentId: number
 }
 
 type DeleteReplyProps = {
@@ -24,7 +29,13 @@ const commentsSlice = createSlice({
     addComment: (state, action: PayloadAction<Comment>) => {
       state.data.comments.push(action.payload)
     },
-    addReply: (state, action: PayloadAction) => {},
+    addReply: (state, action: PayloadAction<AddReplyProps>) => {
+      const comment = state.data.comments.filter(
+        (comment) => comment.id === action.payload.commentId
+      )[0]
+      comment.replies.push(action.payload.reply)
+    },
+    updateReply: (state, action: PayloadAction) => {},
     updateComment: (state, action: PayloadAction) => {},
     deleteComment: (state, action: PayloadAction<{ id: number }>) => {
       state.data.comments = state.data.comments.filter((comment) => {
@@ -52,6 +63,8 @@ const commentsSlice = createSlice({
 
 export const {
   addComment,
+  addReply,
+  updateReply,
   updateComment,
   deleteComment,
   deleteReply,

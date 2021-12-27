@@ -113,7 +113,13 @@ export function CommentCard({
             )
           })}
       </div>
-      {replyOpen && <CommentInput className="mt-3" />}
+      {replyOpen && (
+        <CommentInput
+          type="reply"
+          className="mt-3"
+          comment={comment}
+        />
+      )}
       {modalOpen &&
         ReactDOM.createPortal(
           <Modal onCancel={onCancel} onDelete={deleteHandler} />,
@@ -126,7 +132,7 @@ export function CommentCard({
 type ReplayCardProps = {
   reply: Reply
   currentUser: User
-  comment?: Comment
+  comment: Comment
 }
 
 export function ReplayCard({
@@ -209,7 +215,11 @@ export function ReplayCard({
         </div>
       </div>
       {replyOpen && (
-        <CommentInput className="w-[95%] sm:w-[88%] p-0" />
+        <CommentInput
+          type="reply"
+          className="w-[95%] sm:w-[88%] p-0"
+          comment={comment}
+        />
       )}
       {modalOpen &&
         ReactDOM.createPortal(

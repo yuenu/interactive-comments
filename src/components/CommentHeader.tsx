@@ -21,7 +21,7 @@ export function CommentHeader({
 }: HeaderProps) {
   const isCurrentUser = currentUser.username === user.username
   return (
-    <header className="flex items-center gap-4">
+    <header className="flex items-center gap-3">
       <Avatar user={user} className="w-8 h-8" />
       <span className="font-bold text-blue-darker">
         {user.username}
