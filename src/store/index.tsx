@@ -35,8 +35,16 @@ const commentsSlice = createSlice({
       )[0]
       comment.replies.push(action.payload.reply)
     },
-    updateReply: (state, action: PayloadAction) => {},
-    updateComment: (state, action: PayloadAction) => {},
+    updateReply: (state, action: PayloadAction<Reply>) => {},
+    updateComment: (state, action: PayloadAction<Comment>) => {
+      const comment = state.data.comments.filter(
+        (comment) => comment.id === action.payload.id
+      )[0]
+      const commentIndex = state.data.comments.indexOf(comment)
+      if (commentIndex === -1)
+        throw new Error("UnExpect Error: cant't found the comment!!")
+      state.data.comments[commentIndex] = action.payload
+    },
     deleteComment: (state, action: PayloadAction<{ id: number }>) => {
       state.data.comments = state.data.comments.filter((comment) => {
         return comment.id !== action.payload.id

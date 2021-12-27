@@ -1,16 +1,52 @@
-import {
-  CommentHeader,
-  CommentInput,
-  Feature,
-  Modal,
-} from '@/components'
-import clsx from 'clsx'
-import type { Comment, Reply, User } from '@/types'
 import { useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
-import { deleteComment, useAppDispatch, deleteReply } from '@/store'
+import clsx from 'clsx'
+import type { Comment, Reply, User } from '@/types'
+import { Feature, Modal } from '@/components'
+import {
+  Header as CommentHeader,
+  Input as CommentInput,
+} from '@/components/comment'
+import {
+  deleteComment,
+  useAppDispatch,
+  deleteReply,
+  updateComment,
+} from '@/store'
 
 const portalDiv = document.getElementById('modal')!
+
+type EditModeDisplayProps = {
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement>
+  editText: string
+  innerRef: React.LegacyRef<HTMLTextAreaElement>
+  onUpdate: React.MouseEventHandler<HTMLButtonElement>
+}
+
+function EditModeDisplay({
+  onChange,
+  editText,
+  innerRef,
+  onUpdate,
+}: EditModeDisplayProps) {
+  const handleClick = () => {}
+  return (
+    <div>
+      <textarea
+        ref={innerRef}
+        onChange={onChange}
+        className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
+        name="edit"
+        id="edit"
+        value={editText}></textarea>
+      <button
+        className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
+        onClick={onUpdate}>
+        UPDATED
+      </button>
+    </div>
+  )
+}
 
 type CommentProps = {
   comment: Comment
@@ -37,24 +73,24 @@ export function CommentCard({
     if (!last) setReplyOpen((prev) => !prev)
   }
 
-  const onDelete = () => {
-    setModalOpen(true)
-  }
+  const onCancel = () => setModalOpen(false)
+  const onDelete = () => setModalOpen(true)
+
   const onEdit = () => {
     setEditMode((prev) => !prev)
     if (!editMode) setEditText(originContentText)
   }
 
-  const onCancel = () => {
-    setModalOpen(false)
-  }
-
-  const deleteHandler = () => {
+  const deleteHandler = () =>
     dispatch(deleteComment({ id: comment.id }))
-  }
 
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditText(e.target.value)
+  }
+
+  const onUpdate = () => {
+    dispatch(updateComment({ ...comment, content: editText }))
+    setEditMode(false)
   }
 
   return (
@@ -80,20 +116,12 @@ export function CommentCard({
               {comment.content}
             </span>
           ) : (
-            <div>
-              <textarea
-                ref={textareaRef}
-                onChange={onChange}
-                className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
-                name="edit"
-                id="edit"
-                value={editText}></textarea>
-              <button
-                className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
-                onClick={() => setEditMode(false)}>
-                UPDATED
-              </button>
-            </div>
+            <EditModeDisplay
+              onUpdate={onUpdate}
+              innerRef={textareaRef}
+              onChange={onChange}
+              editText={editText}
+            />
           )}
         </div>
       </div>
@@ -141,20 +169,19 @@ export function ReplayCard({
   comment,
 }: ReplayCardProps) {
   const dispatch = useAppDispatch()
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const originContentText = `@${reply.replyingTo} ` + reply.content
+  const [editText, setEditText] = useState(originContentText)
 
   const [replyOpen, setReplyOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
 
-  const originContentText = `@${reply.replyingTo} ` + reply.content
-  const [editText, setEditText] = useState(originContentText)
-
   const onEdit = () => {
     setEditMode((prev) => !prev)
     if (!editMode) setEditText(originContentText)
   }
-
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   const deleteHandler = () => {
     if (comment)
@@ -162,8 +189,12 @@ export function ReplayCard({
     setModalOpen(false)
   }
 
-  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
     setEditText(e.target.value)
+
+  const onUpdate = () => {
+    console.log('onUpdate')
+    setEditMode(false)
   }
 
   return (
@@ -197,20 +228,12 @@ export function ReplayCard({
               {reply.content}
             </span>
           ) : (
-            <div>
-              <textarea
-                ref={textareaRef}
-                onChange={onChange}
-                className="flex-1 px-4 py-2 border rounded-lg min-h-[8rem] mt-5 mb-3 w-full"
-                name="edit"
-                id="edit"
-                value={editText}></textarea>
-              <button
-                className="float-right p-3 text-white rounded-lg bg-primary hover:bg-blue-bg"
-                onClick={() => setEditMode(false)}>
-                UPDATED
-              </button>
-            </div>
+            <EditModeDisplay
+              onUpdate={onUpdate}
+              innerRef={textareaRef}
+              onChange={onChange}
+              editText={editText}
+            />
           )}
         </div>
       </div>

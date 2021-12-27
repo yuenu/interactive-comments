@@ -7,11 +7,7 @@ function App() {
 
   return (
     <main
-      className={clsx(
-        'min-h-screen',
-        'flex flex-col',
-        'bg-gray-light'
-      )}>
+      className={clsx('min-h-screen bg-gray-light flex flex-col')}>
       <div
         className={clsx(
           'flex flex-col items-center gap-5',
