@@ -10,8 +10,8 @@ import {
 import { Comment, Reply } from '@/types'
 
 type CommentInputProps = {
-  className?: string
   id?: string
+  className?: string
   type: 'comment' | 'reply'
   comment?: Comment
   placeholder?: string
@@ -70,11 +70,10 @@ export function Input({
     <div className={clsx('', className)} id={id}>
       <div
         className={clsx(
-          'h-auto md:h-40 md:max-w-3xl relative',
+          'h-auto md:h-40 md:max-w-3xl relative w-full',
           'mx-auto p-5 md:p-6',
           'bg-white rounded-lg',
-          'flex gap-6 md:gap-4 flex-col md:flex-row',
-          'w-full'
+          'flex gap-6 md:gap-4 flex-col md:flex-row'
         )}>
         <Avatar
           user={currentUser}

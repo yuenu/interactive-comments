@@ -12,6 +12,7 @@ import {
   useAppDispatch,
   deleteReply,
   updateComment,
+  updateReply,
 } from '@/store'
 
 const portalDiv = document.getElementById('modal')!
@@ -29,7 +30,6 @@ function EditModeDisplay({
   innerRef,
   onUpdate,
 }: EditModeDisplayProps) {
-  const handleClick = () => {}
   return (
     <div>
       <textarea
@@ -88,7 +88,7 @@ export function CommentCard({
     setEditText(e.target.value)
   }
 
-  const onUpdate = () => {
+  const onUpdateComment = () => {
     dispatch(updateComment({ ...comment, content: editText }))
     setEditMode(false)
   }
@@ -117,7 +117,7 @@ export function CommentCard({
             </span>
           ) : (
             <EditModeDisplay
-              onUpdate={onUpdate}
+              onUpdate={onUpdateComment}
               innerRef={textareaRef}
               onChange={onChange}
               editText={editText}
@@ -171,8 +171,8 @@ export function ReplayCard({
   const dispatch = useAppDispatch()
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
-  const originContentText = `@${reply.replyingTo} ` + reply.content
-  const [editText, setEditText] = useState(originContentText)
+  // const originContentText = `@${reply.replyingTo} ` + reply.content
+  const [editText, setEditText] = useState(reply.content)
 
   const [replyOpen, setReplyOpen] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
@@ -180,7 +180,7 @@ export function ReplayCard({
 
   const onEdit = () => {
     setEditMode((prev) => !prev)
-    if (!editMode) setEditText(originContentText)
+    if (!editMode) setEditText(reply.content)
   }
 
   const deleteHandler = () => {
@@ -189,11 +189,14 @@ export function ReplayCard({
     setModalOpen(false)
   }
 
-  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditText(e.target.value)
+  }
 
-  const onUpdate = () => {
-    console.log('onUpdate')
+  const onUpdateReply = () => {
+    dispatch(
+      updateReply({ comment, reply: { ...reply, content: editText } })
+    )
     setEditMode(false)
   }
 
@@ -229,7 +232,7 @@ export function ReplayCard({
             </span>
           ) : (
             <EditModeDisplay
-              onUpdate={onUpdate}
+              onUpdate={onUpdateReply}
               innerRef={textareaRef}
               onChange={onChange}
               editText={editText}
@@ -242,6 +245,7 @@ export function ReplayCard({
           type="reply"
           className="w-[95%] sm:w-[88%] p-0"
           comment={comment}
+          id="reply"
         />
       )}
       {modalOpen &&

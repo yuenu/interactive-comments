@@ -22,6 +22,11 @@ type DeleteReplyProps = {
   deleteId: number
 }
 
+type ChangeReplyProps = {
+  comment: Comment
+  reply: Reply
+}
+
 const commentsSlice = createSlice({
   name: 'comments',
   initialState: initialState,
@@ -35,7 +40,18 @@ const commentsSlice = createSlice({
       )[0]
       comment.replies.push(action.payload.reply)
     },
-    updateReply: (state, action: PayloadAction<Reply>) => {},
+    updateReply: (state, action: PayloadAction<ChangeReplyProps>) => {
+      const comment = state.data.comments.filter(
+        (comment) => comment.id === action.payload.comment.id
+      )[0]
+      const reply = comment.replies.filter(
+        (reply) => reply.id === action.payload.reply.id
+      )[0]
+
+      const replyIndex = comment.replies.indexOf(reply)
+
+      comment.replies[replyIndex] = action.payload.reply
+    },
     updateComment: (state, action: PayloadAction<Comment>) => {
       const comment = state.data.comments.filter(
         (comment) => comment.id === action.payload.id

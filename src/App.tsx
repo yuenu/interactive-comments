@@ -1,4 +1,5 @@
-import { Footer, CommentCard, CommentInput } from '@/components'
+import { Footer, CommentCard } from '@/components'
+import { Input as CommentInput } from '@/components/comment'
 import clsx from 'clsx'
 import { useAppSelector } from '@/store'
 
@@ -28,7 +29,7 @@ function App() {
 
       <CommentInput
         type="comment"
-        id="comment-input"
+        id="comment"
         className="px-4 mt-0 md:mt-5"
         placeholder="Add a Comment..."
       />
