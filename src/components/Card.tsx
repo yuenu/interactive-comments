@@ -146,6 +146,7 @@ export function CommentCard({
           type="reply"
           className="mt-3"
           comment={comment}
+          onSubmit={(val) => setReplyOpen(val)}
         />
       )}
       {modalOpen &&
@@ -246,6 +247,7 @@ export function ReplayCard({
           className="w-[95%] sm:w-[88%] p-0"
           comment={comment}
           id="reply"
+          onSubmit={(val) => setReplyOpen(val)}
         />
       )}
       {modalOpen &&

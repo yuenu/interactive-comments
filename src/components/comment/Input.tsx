@@ -15,6 +15,7 @@ type CommentInputProps = {
   type: 'comment' | 'reply'
   comment?: Comment
   placeholder?: string
+  onSubmit?: (val: boolean) => void
 }
 
 export function Input({
@@ -23,6 +24,7 @@ export function Input({
   type,
   comment: currentComment,
   placeholder = 'Add a Reply...',
+  onSubmit,
 }: CommentInputProps) {
   const textRef = useRef<HTMLTextAreaElement | null>(null)
   const currentUser = useAppSelector(
@@ -31,6 +33,7 @@ export function Input({
   const dispatch = useAppDispatch()
 
   const onSubmitHandler = () => {
+    if (onSubmit) onSubmit(false)
     if (textRef.current) {
       switch (type) {
         case 'comment':
